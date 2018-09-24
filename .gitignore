@@ -30,6 +30,7 @@
 *.exe
 *.out
 *.app
+scribble
 
 # Text Editor bullshit
 .vscode/

@@ -187,7 +187,6 @@ void Scribble::startPainting()
         sf::Event event;
         while (m_window.pollEvent(event))
         {
-            // std::cout << event.type << std::endl;
             if (event.type == sf::Event::Closed)
             {
                 m_window.clear();
@@ -204,9 +203,8 @@ void Scribble::startPainting()
                 if (y < m_window.getSize().y - COLOR_BLOCK_SIDE)
                 {
                     Box add(sf::Vector2f(x, y), m_selectedColor);
-                    std::cout << containsThisBox(add) << std::endl;
-                    m_coloredBoxes.push_back(add);
-                    std::cout << "size: " << m_coloredBoxes.size() << std::endl;
+                    if(!containsThisBox(add))
+                        m_coloredBoxes.push_back(add);
                     m_removeDuplicateBoxes = true;
                 }
                 else
