@@ -32,8 +32,9 @@
 *.app
 scribble
 
-# Text Editor bullshit
+# Text Editor and personal bullshit
 .vscode/
+Todo.md
 
 # Compiler bullshit
 *.dSYM

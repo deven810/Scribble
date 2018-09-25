@@ -10,9 +10,9 @@
 #include "rapidjson/include/rapidjson/document.h"
 
 #define MAX_COLOR_OPTIONS 5
-#define MAX_CURRENT_PAINT_COLORS 8 
+#define MAX_CURRENT_PAINT_COLORS (PAINTED_BLOCKS_PER_ROW-1)
 #define SCALE 50
-#define COLOR_BLOCK_SIDE 50
+#define COLOR_BLOCK_SIDE SCALE
 #define PALETTE_COLORS_PER_ROW 5
 #define PAINTED_BLOCKS_PER_ROW 16
 
@@ -24,11 +24,14 @@ public:
 
 protected:
     void draw_grid(sf::RenderWindow &window);
+
+private:
     void draw_boxes(sf::RenderWindow &window, std::vector<Box> &color_boxes);
     void draw_palette();
     void position_paints();
     void draw_paints();
     void startPainting();
+    // void createRefreshButton();
     void fillPalette();
     void initializeCURL();
     void cleanCURL();
@@ -41,18 +44,18 @@ protected:
     std::deque<Box> m_paintColors; 
     Box m_paletteColors[MAX_COLOR_OPTIONS];
     sf::Color m_selectedColor;
+    // sf::Sprite sprite;
     CURL *m_curl;
     CURLcode m_res;
+
+    bool m_removeDuplicateBoxes; 
+    bool m_mousePressed;
 
     struct MemoryStruct
     {
         char *memory;
         size_t size;
     };
-
-private:
-    bool m_removeDuplicateBoxes; 
-    bool m_mousePressed;
 };
 
 #endif

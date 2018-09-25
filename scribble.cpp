@@ -3,28 +3,44 @@
 
 Scribble::Scribble()
 {
+    // Set up windows
     m_window.create(sf::VideoMode(COLOR_BLOCK_SIDE * PAINTED_BLOCKS_PER_ROW,
                                   (COLOR_BLOCK_SIDE * PAINTED_BLOCKS_PER_ROW)),
-                    "Scribble");
+                    "Scribble", sf::Style::Close);
     m_paletteWindow.create(sf::VideoMode(COLOR_BLOCK_SIDE * PALETTE_COLORS_PER_ROW,
                                          COLOR_BLOCK_SIDE * (int)(MAX_COLOR_OPTIONS / PALETTE_COLORS_PER_ROW)),
-                           "PaletteWindow");
+                           "PaletteWindow", sf::Style::Close);
     m_paletteWindow.setPosition(sf::Vector2i(m_paletteWindow.getPosition().x + m_window.getSize().x,
                                              m_paletteWindow.getPosition().y));
+    // Set up rest of the member variables.
     m_selectedColor = sf::Color::White;
     m_removeDuplicateBoxes = false;
     m_mousePressed = false;
     initializeCURL();
+    // createRefreshButton();
     fillPalette();
     startPainting();
 }
+
+// void Scribble::createRefreshButton()
+// {
+//     /*
+//     sf::Texture texture;
+//     sf::Image image;
+//     if (!image.loadFromFile("Data/refresh_white.png"))
+//         std::cerr << "Fuck" << std::endl;
+//     if (!texture.loadFromImage(image))
+//         std::cerr << "Fuck" << std::endl;
+//     sprite.setTexture(texture);
+//     // sprite.setColor(sf::Color::White);
+//     sprite.setPosition(m_window.getSize().x - COLOR_BLOCK_SIDE, m_window.getSize().y - COLOR_BLOCK_SIDE);
+//     */
+// }
 
 Scribble::~Scribble()
 {
     m_window.~RenderWindow();
     m_paletteWindow.~RenderWindow();
-    // delete[] m_paintColors;
-    // delete[] m_paletteColors;
     cleanCURL();
 }
 
@@ -90,8 +106,6 @@ void Scribble::fillPalette()
         fprintf(stderr, "curl_easy_perform() failed: %s\n", curl_easy_strerror(m_res));
         exit(1);
     }
-    else
-        std::cout << chunk.memory;
 
     doc.Parse(chunk.memory);
     const rapidjson::Value &result = doc["result"];
@@ -203,17 +217,21 @@ void Scribble::startPainting()
                 if (y < m_window.getSize().y - COLOR_BLOCK_SIDE)
                 {
                     Box add(sf::Vector2f(x, y), m_selectedColor);
-                    if(!containsThisBox(add))
+                    if (!containsThisBox(add))
                         m_coloredBoxes.push_back(add);
                     m_removeDuplicateBoxes = true;
                 }
-                else
+                else if (x < m_window.getSize().x - COLOR_BLOCK_SIDE)
                 {
                     int index = x / COLOR_BLOCK_SIDE;
                     if (index < m_paintColors.size())
                     {
                         m_selectedColor = m_paintColors[index].getColor();
                     }
+                }
+                else 
+                {
+                    fillPalette();
                 }
             }
             else if (event.type == sf::Event::MouseMoved && m_mousePressed)
@@ -226,7 +244,8 @@ void Scribble::startPainting()
                 if (y < (m_window.getSize().y - COLOR_BLOCK_SIDE))
                 {
                     Box add(sf::Vector2f(x, y), m_selectedColor);
-                    if (!(m_coloredBoxes.back() == add)) {
+                    if (!(m_coloredBoxes.back() == add))
+                    {
                         m_coloredBoxes.push_back(add);
                     }
                     m_removeDuplicateBoxes = true;
@@ -282,6 +301,7 @@ void Scribble::startPainting()
         draw_palette();
         draw_paints();
         draw_boxes(m_window, m_coloredBoxes);
+        // m_window.draw(sprite);
 
         m_paletteWindow.display();
         m_window.display();
